@@ -229,7 +229,7 @@ A dark factory does not remove review. It moves review to places that scale: a s
 
 ## Author
 
-Built in the open by **[Mike Gorelikov](https://github.com/mikegorelikoff)** under **[unattended-factory](https://github.com/unattended-factory)**. Site: [unattended.unmerged.tech](https://unattended.unmerged.tech).
+Built in the open by **[Mihail Gorelikov](https://github.com/mikegorelikoff)** under **[unattended-factory](https://github.com/unattended-factory)**. Site: [unattended.unmerged.tech](https://unattended.unmerged.tech).
 
 If this is the factory you wanted to exist, **star the repo** and follow [@mikegorelikoff](https://github.com/mikegorelikoff): that is the fastest way to know when the first release ships.
 
