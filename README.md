@@ -235,4 +235,4 @@ If this is the factory you wanted to exist, **star the repo** and follow [@mikeg
 
 ## License
 
-[Apache License 2.0](LICENSE) © Mike Gorelikov
+[Apache License 2.0](LICENSE). Copyright 2026 Mihail Gorelikov.
