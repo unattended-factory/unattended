@@ -53,17 +53,16 @@ The result is a factory that looks like nothing is happening, until the one mome
 
 ```mermaid
 flowchart LR
-    L[Linear issue<br/>labelled] --> I[Intake<br/>5 checks]
-    I --> B[Builder<br/>isolated worktree]
-    B --> V[Verifier<br/>different model]
-    V --> G[Gates<br/>7 checks]
-    G --> P[Draft PR]
-    P --> M[Merge<br/>GitHub branch rules]
-    I -. cannot proceed .-> H
-    B -. budget or rounds .-> H
-    V -. FAIL .-> B
-    G -. gate failed .-> H
-    H[Needs a person<br/>with the reason]
+    L[Linear issue<br/>labelled] --> pipe
+    subgraph pipe[" "]
+        direction LR
+        I[Intake<br/>5 checks] --> B[Builder<br/>isolated worktree]
+        B --> V[Verifier<br/>different model]
+        V -->|FAIL, next round| B
+        V -->|PASS| G[Gates<br/>7 checks]
+    end
+    G --> P[Draft PR] --> M[Merge<br/>GitHub branch rules]
+    pipe -. blocked, over budget or out of rounds .-> H[Needs a person<br/>with the reason]
 ```
 
 | Stage | Who acts | What it returns |
