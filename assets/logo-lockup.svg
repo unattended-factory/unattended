@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" width="880" height="200" role="img" aria-label="unattended">
+<g transform="translate(20,20) scale(.3125)"><rect x="176" y="72" width="160" height="368" rx="48" fill="#13171b" stroke="#2c353c" stroke-width="8"/><circle cx="256" cy="144" r="30" fill="none" stroke="#2c353c" stroke-width="8"/><circle cx="256" cy="256" r="30" fill="#f5b83d"/><circle cx="256" cy="368" r="30" fill="none" stroke="#2c353c" stroke-width="8"/></g>
+<text x="150" y="124" font-family="Instrument Sans, Helvetica, Arial, sans-serif" font-weight="600" font-size="88" letter-spacing="-2" fill="#e8edf0">unattended</text>
+</svg>
