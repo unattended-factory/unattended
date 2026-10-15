@@ -15,15 +15,15 @@
   <a href="#quickstart">Quickstart</a> ·
   <a href="#the-console">Console</a> ·
   <a href="#roadmap">Roadmap</a> ·
-  <a href="https://github.com/unattended-factory">Author</a>
+  <a href="https://github.com/mikegorelikoff">Author</a>
 </p>
 
 <p align="center">
-  <img alt="status: pre-alpha" src="https://img.shields.io/badge/status-pre--alpha-f5b83d?style=flat-square&labelColor=0d1013">
-  <img alt="config: TOON" src="https://img.shields.io/badge/config-TOON-4fc3f7?style=flat-square&labelColor=0d1013">
-  <img alt="tracker: Linear" src="https://img.shields.io/badge/tracker-Linear-e8edf0?style=flat-square&labelColor=0d1013">
-  <img alt="merge: GitHub" src="https://img.shields.io/badge/merge-GitHub-e8edf0?style=flat-square&labelColor=0d1013">
-  <img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-e8edf0?style=flat-square&labelColor=0d1013">
+  <img alt="status: pre-alpha" src="https://img.shields.io/badge/status-pre--alpha-yellow?style=flat-square&labelColor=black">
+  <img alt="config: TOON" src="https://img.shields.io/badge/config-TOON-blue?style=flat-square&labelColor=black">
+  <img alt="tracker: Linear" src="https://img.shields.io/badge/tracker-Linear-lightgrey?style=flat-square&labelColor=black">
+  <img alt="merge: GitHub" src="https://img.shields.io/badge/merge-GitHub-lightgrey?style=flat-square&labelColor=black">
+  <img alt="license: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-lightgrey?style=flat-square&labelColor=black">
 </p>
 
 ---
@@ -36,7 +36,7 @@ Most of a backlog is work you already know how to do: the bug with a clear repro
 
 The result is a factory that looks like nothing is happening, until the one moment something needs you.
 
-> **Status: pre-alpha.** The concept, the loop and the design system are done, and the installer is being built in the open. Nothing is on npm yet. Commands below show the target behaviour. [Follow the author](https://github.com/unattended-factory) to watch it land.
+> **Status: pre-alpha.** The concept and the loop are done, and the installer is being built in the open. Nothing is on npm yet. Commands below show the target behaviour. [Follow the author](https://github.com/mikegorelikoff) to watch it land.
 
 ## Why it is different
 
@@ -51,11 +51,19 @@ The result is a factory that looks like nothing is happening, until the one mome
 
 ## How it works
 
-```
-Linear issue ─▶ Intake ─▶ Builder ─▶ Verifier ─▶ Gates ─▶ Draft PR ─▶ Merge
-   (labelled)    5 checks   worktree    other model   7 checks   GitHub      branch rules
-                    │          │            │            │
-                    └──────────┴────────────┴────────────┴──▶ Needs a person, with the reason
+```mermaid
+flowchart LR
+    L[Linear issue<br/>labelled] --> I[Intake<br/>5 checks]
+    I --> B[Builder<br/>isolated worktree]
+    B --> V[Verifier<br/>different model]
+    V --> G[Gates<br/>7 checks]
+    G --> P[Draft PR]
+    P --> M[Merge<br/>GitHub branch rules]
+    I -. cannot proceed .-> H
+    B -. budget or rounds .-> H
+    V -. FAIL .-> B
+    G -. gate failed .-> H
+    H[Needs a person<br/>with the reason]
 ```
 
 | Stage | Who acts | What it returns |
@@ -68,13 +76,54 @@ Linear issue ─▶ Intake ─▶ Builder ─▶ Verifier ─▶ Gates ─▶ Dr
 
 The Builder never grades its own work. Held-out scenarios, which the Builder cannot read, decide acceptance. And the final word is GitHub branch protection, not the factory.
 
+### The life of one issue
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant L as Linear
+    participant F as unattended
+    participant A as Builder
+    participant V as Verifier
+    participant G as GitHub
+    L->>F: issue labelled factory
+    F->>F: intake: 5 checks, budget check
+    F->>A: task packet (TOON)
+    A->>G: branch, failing test, fix
+    F->>V: diff, tests, scenarios
+    V-->>F: verdict (JSON)
+    F->>G: draft PR, status checks
+    G-->>L: merged, issue closed
+    Note over F,L: On any failure the same reason goes to the console and to a Linear comment
+```
+
 ## Built on six ideas
 
 **1. Real systems only.** Real Linear, real GitHub, real money. No mocks in the loop, so what you see in shadow mode is what you get in production.
 
 **2. Every call is metered.** A token ledger and budgets are checked before each call, per issue and per day. The number that matters is cost per accepted change, and you can read it on one screen.
 
-**3. Promotion is earned.** Each task type climbs six stages, S1 to S6, from shadow mode to project mode, on evidence: accepted changes, reverts, verifier agreement, cost. One revert drops it a stage.
+**3. Promotion is earned.** Each task type climbs six stages, from shadow mode to project mode, on evidence: accepted changes, reverts, verifier agreement, cost. One revert drops it a stage.
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> S1
+    S1: S1 Shadow
+    S2: S2 Human merges
+    S3: S3 Auto, bugfix
+    S4: S4 Auto, CRUD
+    S5: S5 Per task type
+    S6: S6 Project mode
+    S1 --> S2: evidence
+    S2 --> S3: evidence
+    S3 --> S4: evidence
+    S4 --> S5: evidence
+    S5 --> S6: evidence
+    S6 --> S5: any revert
+    S5 --> S4: any revert
+    S4 --> S3: any revert
+```
 
 **4. A failure is never silent.** Every Hold or Fail carries its cause with a number or a name: "The failing gate is acceptance/checkout, at 0.62 against a bar of 0.90." The same text appears in the console and in the Linear comment.
 
@@ -111,7 +160,7 @@ Start in **shadow mode**: the factory drafts pull requests and a person merges e
 
 ## The console
 
-One shell, eight screens. The Tower in the header shows three lamps, and only the amber one ever asks for a person.
+One shell, eight screens, and the header always shows whether anything needs a person and lets you pause from anywhere.
 
 | Screen | Answers |
 | --- | --- |
@@ -124,38 +173,47 @@ One shell, eight screens. The Tower in the header shows three lamps, and only th
 | **Project** | For a whole project: the issue graph in waves, the pass fraction, the budget |
 | **Config** | Edit TOON with a diff and validation, nothing saves unconfirmed |
 
-Status is always shape, word and color together, and pass is blue, not green, so nothing depends on a red-green difference:
+## Project mode
 
-| State | Mark | Word |
-| --- | --- | --- |
-| Queued | hollow circle | Queued |
-| Running | turning ring | Building, round 2 |
-| Pass | disc with check, sky blue | Merged |
-| Hold | amber diamond | Needs a person |
-| Fail | square with cross | Rejected at intake |
-| Paused | two bars | Paused by an operator |
+Point it at a whole project, not one issue. A planner reads the Linear graph, groups issues into waves that never touch the same files, and builds wave by wave against held-out acceptance scenarios.
+
+```mermaid
+flowchart TD
+    P[Plan approved by a person] --> W1[Wave 1]
+    W1 --> W2[Wave 2]
+    W2 --> W3[Wave N]
+    W3 --> S{Pass fraction<br/>above the bar?}
+    S -- yes --> D[DONE<br/>one release PR for a person]
+    S -- no gain after 2 waves --> T[STUCK<br/>stops and reports]
+    W1 -. budget reached .-> O[OVER BUDGET<br/>finishes in-flight issues, stops]
+    W2 -. budget reached .-> O
+```
+
+Nothing ships without a person approving the release.
 
 ## Put it on your own domain
 
 An optional nginx deploy serves the console on your domain, with sign-in, `viewer` and `operator` roles, CSRF protection, trusted-proxy handling, systemd units and a compose file. Operators can pause from a phone.
 
-## Design: monochrome until something needs you
-
-The interface is graphite and ink. **Color means state and nothing else**, and amber is the only color allowed to ask for attention. Night is the default theme, Day keeps the same structure for bright rooms. The design system ships with 28 components and nine example pages.
-
-| Token | Night | Day |
-| --- | --- | --- |
-| `ground` | `#0d1013` | light graphite on white |
-| `pass` | `#4fc3f7` | `#0a6492` |
-| `hold` | `#f5b83d` | `#855400` |
-| `fail` | `#ff7b5c` | `#b2371a` |
-
-Type is Instrument Sans for text, IBM Plex Mono for ids and numbers, and Barlow Semi Condensed for the one figure a screen is about.
-
 ## Roadmap
 
+```mermaid
+gantt
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b
+    title Build order
+    section Done
+    Concept, loop, limits     :done, c0, 2026-09-20, 2026-10-10
+    section Next
+    G1 Core                   :g1, 2026-10-16, 14d
+    G2 Build and verify       :g2, after g1, 14d
+    G3 Merge                  :g3, after g2, 10d
+    G4 Console                :g4, after g3, 14d
+    G5 Promotion              :g5, after g4, 10d
+    G6 Project mode           :g6, after g5, 14d
+```
+
 - [x] **Concept**: the loop, the project layer, the limits
-- [x] **Design system**: tokens, 28 components, nine example pages
 - [ ] **G1 Core**: Linear client, intake, token ledger, TOON config
 - [ ] **G2 Build and verify**: worktrees, Builder, Verifier, gates
 - [ ] **G3 Merge**: branch protection, auto-merge, escalation
@@ -164,16 +222,18 @@ Type is Instrument Sans for text, IBM Plex Mono for ids and numbers, and Barlow 
 - [ ] **G6 Project mode**: planner, waves, held-out scenarios
 - [ ] **Native Linear agent**: delegate an issue to unattended instead of labelling it
 
+Dates are a plan, not a promise.
+
 ## Honest limits
 
 A dark factory does not remove review. It moves review to places that scale: a second model, held-out scenarios, gates and branch protection. Without those, a green pipeline can still be wrong. Start in shadow mode, keep budgets low, and promote a task type only when the evidence says so.
 
 ## Author
 
-Built in the open by **[unattended-factory](https://github.com/unattended-factory)**. Site: [unattended.unmerged.tech](https://unattended.unmerged.tech).
+Built in the open by **[Mike Gorelikov](https://github.com/mikegorelikoff)** under **[unattended-factory](https://github.com/unattended-factory)**. Site: [unattended.unmerged.tech](https://unattended.unmerged.tech).
 
-If this is the factory you wanted to exist, **star the repo** and follow the author: that is the fastest way to know when the first release ships.
+If this is the factory you wanted to exist, **star the repo** and follow [@mikegorelikoff](https://github.com/mikegorelikoff): that is the fastest way to know when the first release ships.
 
 ## License
 
-[MIT](LICENSE) © unattended-factory
+[Apache License 2.0](LICENSE) © Mike Gorelikov
